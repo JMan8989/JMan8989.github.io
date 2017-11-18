@@ -2,7 +2,7 @@
 layout: post
 title: "Edge Case: Many Tags"
 categories:
-  - programming
+  - Programming
 tags:
   - Structures(구조체)
   - Unions(공용체)
