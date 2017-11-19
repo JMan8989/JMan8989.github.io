@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Edge Case: Many Tags"
+title: "Structures, Unions, and Enumerations"
 categories:
   - Programming
 tags:
@@ -54,4 +54,144 @@ struct{
 
 // part1, part2의 number와 name 멤버는 employee1, employee2와 충돌되지 않음
 ```
+
+구조체는 저장될 변수 리스트로 초기화 한다.
+
+```
+struct{
+	int number;
+	char name[NAME_LEN+1];
+    int on hand;
+} part1 = {528, "Disk drive", 10},
+  part2 = {914, "Printer cable", 5};
+```
+구조체 초기화 표현은 constant여야 한다. 변수가 될 수 없다(C99에서는 완화되었는데 뒤에서 확인한다.). Initializer의 갯수가 적으면 남은 변수들은 0으로 초기화 된다.
+
+- Designated Initializers
+part1 의 초기화
+```
+{526, "Disk Drive", 10}
+```
+Designated initializer 이용
+```
+{.number = 528, .name = "Disk drive", .on_hand = 10}
+```
+.number, .name, .on_hand 를 designator 라고 부른다.
+장점으로는 가독성과 정합성을 체크할 수 있고, 변수값을 순서대로 작성할 필요가 없다.
+
+배열은 []를 이용하여 position으로 요소를 선택하였지만 구조체는 멤버의 이름을 이용한다.
+```
+구조체명.멤버이름
+```
+```
+printf("Part number: %d\n", part1.number);
+printf("Part name: %s\n", part1.name);
+printf("Quantity on hand: %d\n", part1.on_hand);
+```
+
+배열에서는 = 연산자 사용이 안되지만, 구조체에서는 가능하다.
+part1, part2 처럼 동시에 선언된 구조에서만 가능하다.
+
+
+
+##Structure Types
+구조체의 타입 이름을 정의할 수 있다. 하나는 structure tag, 또 다른 하나는 typedef 로 가능하다.
+
+- structure tag
+특정한 구조체를 확인하기 위해 사용한다.
+```
+struct part {
+	int number;
+    char name[NAME_LEN+1];
+    int on_hand;
+};
+```
+part 태그를 만들면, 변수를 선언하기 위해 사용할 수 있다.
+```
+struct part part1, part2;
+```
+part앞에 struct가 오지않으면 다른 이름과 충돌이 난다.
+structure tag와 구조체 변수 선언과 결합할 수 있다.
+```
+struct part{
+	int number;
+    char name[NAME_LEN+1];
+    int on_hand;
+} part1, part2
+```
+struct part 타입으로 선언된 구조체는 다른 것과 호환된다.
+```
+struct part part1 = {528, "Disk drive", 10};
+struct part part2;
+part2 = part1;		/* legal; both parts have the same type */
+```
+
+- Defining a Structure Type
+타입 이름을 정의하기 위해서 typedef 를 사용할 수 있다.
+```
+typedef struct{
+	int number;
+    char name[NAME_LEN+1];
+    int on_hand;
+} Part;
+```
+타입 이름으로 Part는 끝에 온다. struct 뒤에 오지 않는다. Part는 타입 이름이기 때문에 struct Part로 사용하지 않는다.
+```
+Part part1, aprt2;
+```
+###Structures as Arguments and Return Values
+함수는 argument나 return 값으로 구조체를 가질 수 있다.
+```
+void print_part(struct part p)
+{
+	printf("Part number: %d\n", p.number);
+    printf("Part name: %s\n", p.name);
+    printf("Quantity on hand: %d\n", p.on_hand);
+}
+```
+print_part를 호출한다.
+```
+print_part(part1);
+```
+두 번째 함수는 인자로부터 만들어내는 part 구조체를 리턴한다.
+```
+struct part build_part(int number, const char *name, int on_hand)
+{
+	struct part p;
+    
+    p.number = number;
+    strcpy(p.name, name);
+    p,on_hand = on_hand;
+    return p;
+}
+```
+구조체를 함수로 전달하거나 함수로부터 구조체를 리턴하는 것은 구조체 모든 멤버를 복사하는 것이다. 특히 구조체가 크면 프로그램에 무리를 줄 수 있다. 이러한 과부하를 피하기 위해서 구조체를 직접 전달하기 보다 포인터를 전달하기도 한다. 유사하게 구조체를 리턴하기 보다 구조체의 포인터를 리턴한다. 뒤에서 배울 예정이다.
+
+##Nested Arrays and Structures
+??
+##Arrays of Structures
+
+##Unions
+공용체는 구조체처럼 다른 타입의 여러 멤버들로 구성한다. 하지만 컴파일러는 가장 큰 멤버에 대한 공간만 할당한다. 그결과 하나의 멤버에 새로운 값을 할당하면 다른 멤버의 값도 변한다.
+
+- union
+```
+union{
+	int i;
+    double d;
+} u;
+```
+- structure
+```
+struct{
+	int i;
+    double d;
+} s;
+
+s와 u는 한가지 다르다. s는 멤버들이 메모리안에 다른 주소를 가지지만 u는 같은 주소에 저장된다.
+
+![ex_screenshot](JMan8989.github.io/_screenshots/20171119_140904.png)
+
+
+
 
