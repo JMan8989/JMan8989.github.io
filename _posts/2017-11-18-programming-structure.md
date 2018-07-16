@@ -211,3 +211,69 @@ union{
     double d;
 } u = {.d = 10.0};
 ```
+공용체는 몇 가지 사용 예가 있다. 그 중 2가지에 대해 알아볼 것이다.
+###Using Unions to Save Space
+공용체는 구조체의 공간을 절약하기 위해 사용한다. 선물 카탈로그를 통해 팔리는 아이템들의 정보를 담는 구조체를 만든다고 가정해보자. 카탈로그는 3가지 상품(books, mugs, shirts)가 있다. 각각 재고번호, 가격 그리고 아이템별로 다른 정보를 가진다.
+- Book: Title, author, number of pages
+- Mugs: Design
+- Shirts: Design, colors available, sizes available
+
+처음으로 다음과 같이 구조체를 설계한다.
+```
+struct catalog_item{
+	int stock_number;
+    double price;
+    int item_type;
+    char title[TITLE_LEN+1];
+    char author[AUTHOR_LEN+1];
+    int num_pages;
+    char design[DESIGN_LEN+1];
+    int colors;
+    int sizes;
+};
+```
+`item_type` 멤버는 `BOOK`, `MUG`, `SHIRT` 값 중 하나를 가진다.
+`colors`와 `sizes`멤버는 색과 사이즈의 조합으로 저장된다. 비록 구조체는 사용가능하지만, 공간 낭비다. 왜냐하면 구조체의 정보 일부분만 카탈로그 모든 아이템의 공통으로 사용되기 때문이다. 아이템이 책이면 `design`, `colors`, `sizes`는 필요없다. `catalog_item` 구조체 내에 공용체를 사용하면 공간을 줄일 수 있다. 공용체의 멤버는 아이템이 필요하는 데이터를 담은 구조체가 될 것이다.
+```
+struct catalog_item{
+	int stock_number;
+    double price;
+    int item_type;
+    union{
+    	struct{
+        	char title[TITLE_LEN+1];
+            char author[AUTHOR_LEN+1];
+            int num_pages;
+        } book;
+        struct{
+        	char design[DESIGN_LEN+1];
+        } mug;
+        struct{
+        	char design[DESIGN_LEN+1];
+            int colors;
+            int sizes;
+        } shirt;
+    } item;
+};
+```
+만약 c가 책을 나타내는 `catalog_item`구조체라면, 우리는 책의 이름을 다음과 같이 보여줄 수 있다.
+```
+printf("%s", c.item.book.title);
+```
+###Using Unions to Build Mixed Data Structures
+다른 타입의 데이터를 담은 데이터 구조를 만들 수 있다. `int`와 `double` 값을 가지는 배열이 필요하다고 하자. 배열은 같은 타입이여야 하기 때문에 이것은 불가능하다. 하지만 공용체를 사용하게 되면 가능하다. 배열 내에 다른 종류의 데이터를 나타내는 공용체를 정의한다.
+```
+typedef union{
+	int i;
+    double d;
+} Number;
+```
+다음으로, 요소가 `Number`값인 배열을 만든다. 각 `number_array`의 요소는 `Number` 공용체이다. `number_array`는 `int`와 `double`값을 혼합하여 저장할 수 있다.
+```
+number_array[0].1 = 5;
+number_array[1].d = 8.395;
+```
+###Adding a "Tag Field" to a Union
+
+##Enumerations
+enumberated type는 각 값들에게 이름이 부여된 리스트의 값들이다. 
