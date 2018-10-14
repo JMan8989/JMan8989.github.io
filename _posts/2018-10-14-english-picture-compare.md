@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Lesson3 Describe the picture 2
+title: Lesson3 Compare and Contrast the Picture
 categories:
   - English
 tags:
